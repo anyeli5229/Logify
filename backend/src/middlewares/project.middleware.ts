@@ -1,15 +1,33 @@
-import type { Request, Response, NextFunction } from "express"
-import z from "zod";
+import type { Request, Response, NextFunction } from "express";
+import { prisma } from "../config/prisma";
+import { Project, Task } from "@prisma/client";
 
-const paramIdSchema = z.uuid("ID no válido");
-
-export const validarId = (req: Request, res: Response, next: NextFunction) => {
-    const { id } = req.params;
-    const validation = paramIdSchema.safeParse(id);
-    if (!validation.success) {
-        res.status(400).json({ error: validation.error.issues[0].message });
-        return;
+declare global {
+    namespace Express {
+        interface Request {
+            project: Project,
+            task: Task
+        }
     }
+}
 
-    next();
+export async function validateProjectExist(req: Request, res: Response, next: NextFunction, projectId: string) {
+    try {
+
+        const project = await prisma.project.findUnique({
+            where: { 
+                id: projectId
+            }
+        });
+
+        if (!project) {
+            res.status(404).json({ error: "Proyecto no encontrado" });
+            return;
+        }
+
+        req.project = project;
+        next();
+    } catch (error) {
+        res.status(500).json({ error: "Hubo un error" });
+    }
 }

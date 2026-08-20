@@ -38,7 +38,10 @@ export class ProjectController {
         try {
             const { id } = req.params;
             const project = await prisma.project.findUnique({
-                where: { id }
+                where: { id },
+                include: {
+                    tasks: true
+                }
             })
 
             if (!project) {

@@ -4,15 +4,12 @@ type ErroresZod = {
     [campo: string] : string;
 }
 
-export function formatearErroresZod(error: ZodError) {
-    return error.issues.reduce<ErroresZod>((errores, error) => {
-        const campo = error.path[0]
-
-        if(typeof campo === "string") {
-            errores[campo] = error.message
+export function formatearErroresZod(error: ZodError): ErroresZod {
+  return error.issues.reduce<ErroresZod>((errores, issue) => {
+    // Si el path no es un string, se asigna  "general" para que no de undefined
+    const campo = (typeof issue.path[0] === 'string') ? issue.path[0] : 'general';
     
-        }
-            return errores;
-
-    }, {})
+    errores[campo] = issue.message;
+    return errores; //acumulador
+  }, {});
 }
