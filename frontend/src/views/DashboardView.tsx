@@ -2,17 +2,18 @@ import { Link } from "react-router-dom";
 
 export default function DashboardView() {
   return (
-    <div className="space-y-10 mt-5">
+    <>
 
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-6">
-        <div className="my-3">
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 mb-3">
-            Proyectos
-          </h1>
-          <p className="text-base text-slate-500 font-medium mt-1">
-            Maneja, organiza y coordina los flujos de trabajo de tus equipos.
-          </p>
-        </div>
+      <div className="border-b border-slate-200 space-y-6 my-10 pb-6">
+
+        <h1 className="text-4xl font-black tracking-tight text-slate-900 mb-3">
+          Proyectos
+        </h1>
+
+        <p className="text-base text-slate-500 font-medium">
+          Maneja, organiza y coordina los flujos de trabajo de tus equipos.
+        </p>
+
 
         <nav>
           <Link
@@ -36,9 +37,9 @@ export default function DashboardView() {
         </nav>
       </div>
 
-      <h3 className="text-base font-bold text-slate-800">
-        No hay proyectos registrados
+      <h3 className="text-base font-bold text-slate-800 text-center">
+        No hay proyectos registrados aun.
       </h3>
-    </div>
+    </>
   )
 }

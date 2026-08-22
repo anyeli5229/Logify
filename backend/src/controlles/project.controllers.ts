@@ -28,7 +28,7 @@ export class ProjectController {
                 data: validation.data
             })
 
-            res.status(201).json({message: "Proyecto creado correctamente"});
+            res.status(201).json({ message: "Proyecto creado correctamente" });
         } catch (error) {
             res.status(500).json({ error: 'Error al crear el proyecto' });
         }
@@ -79,7 +79,7 @@ export class ProjectController {
                 data: validation.data
             })
 
-            res.json({message: "Proyecto actualizado correctamente"});
+            res.json({ message: "Proyecto actualizado correctamente" });
         } catch (error) {
             res.status(500).json({ error: 'Error al actualizar el proyecto' });
         }
@@ -100,9 +100,9 @@ export class ProjectController {
                 where: { id }
             });
 
-            res.json({message: "Proyecto eliminado correctamente"});
+            res.json({ message: "Proyecto eliminado correctamente" });
         } catch (error) {
-            res.status(500).json({error: "Error al eliminar el proyecto"})
+            res.status(500).json({ error: "Error al eliminar el proyecto" })
         }
 
     }
