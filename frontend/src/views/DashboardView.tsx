@@ -1,7 +1,25 @@
+import ProjectCard from "@/components/projects/ProjectCard";
+import Spinner from "@/components/Spinner";
+import { getAllProjects } from "@/services/ProjectService";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
 export default function DashboardView() {
-  return (
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["projects"],
+    queryFn: getAllProjects
+  })
+
+  if (isLoading) {
+    return (
+      <div className="min-h-100 flex items-center justify-center">
+        <Spinner size="lg" label="Cargando proyectos..." />
+      </div>
+    )
+  }
+
+  if (data) return (
     <>
 
       <div className="border-b border-slate-200 space-y-6 my-10 pb-6">
@@ -37,9 +55,28 @@ export default function DashboardView() {
         </nav>
       </div>
 
-      <h3 className="text-base font-bold text-slate-800 text-center">
-        No hay proyectos registrados aun.
-      </h3>
+      {data.length ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {data.map((project) => (
+            <ProjectCard
+              key={project.id}
+              project={project}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="text-base font-bold text-slate-800 text-center">
+          No hay proyectos registrados aún. {" "}
+          <span>
+            <Link
+              className="text-violet-700 font-bold"
+              to={"/projects/create"}
+            >
+              Comienza creando uno.
+            </Link>
+          </span>
+        </p>
+      )}
     </>
   )
 }

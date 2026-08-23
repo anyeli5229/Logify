@@ -1,41 +1,50 @@
-import ProjectForm from "@/components/projects/ProjectForm";
-import Spinner from "@/components/Spinner";
-import { createProject } from "@/services/ProjectService";
-import type { ProjectFormData } from "@/types";
-import { useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import ProjectForm from "./ProjectForm";
+import { useForm } from "react-hook-form";
+import Spinner from "../Spinner";
+import type { Project, ProjectFormData } from "@/types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateProject } from "@/services/ProjectService";
 import { toast } from "sonner";
 
+type EditProjectFormProps = {
+    data: ProjectFormData,
+    projectId: Project["id"]
+}
 
-export default function CreateProjectView() {
-    const initialValues: ProjectFormData = { projectName: "", clientName: "", description: "" };
+export default function EditProjectForm({ data, projectId }: EditProjectFormProps) {
+    const initialValues: ProjectFormData = { projectName: data.projectName, clientName: data.clientName, description: data.description };
 
     const { register, handleSubmit, formState: { errors } } = useForm({ defaultValues: initialValues });
-
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const { mutate, isPending } = useMutation({
-        mutationFn: createProject,
+        mutationFn: updateProject,
         onSuccess: (data) => {
-            toast.success(data.message);
-            navigate("/");
+            queryClient.invalidateQueries({queryKey: ["projects"]});
+            queryClient.invalidateQueries({queryKey: ["editProject", projectId]});
+            toast.success(data.message),
+            navigate("/")
         },
         onError: (data) => {
-            toast.error(data.message);
+            toast.error(data.message)
         }
-    })
+    });
 
-    const handleForm = (formData: ProjectFormData) => mutate(formData);
+    const handleForm = (formData: ProjectFormData) => {
+        const data = { projectId, formData }
+        mutate(data)
+    }
 
     return (
         <div className="space-y-6 my-10 pb-6">
             <h1 className="text-4xl font-black tracking-tight text-slate-900 mb-3">
-                Nuevo proyecto
+                Editar proyecto
             </h1>
 
             <p className="text-slate-500 text-base font-medium">
-                Define las bases de tu proyecto para comenzar a asignar tareas y dar seguimiento al progreso.
+                Edita las bases de tu proyecto para comenzar a asignar tareas y dar seguimiento al progreso.
             </p>
 
             <nav>
@@ -66,7 +75,7 @@ export default function CreateProjectView() {
                     {isPending ? (
                         <Spinner size="sm" />
                     ) : (
-                        "Crear Proyecto"
+                        "Guardar Cambios"
                     )}
                 </button>
 
