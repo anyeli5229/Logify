@@ -22,7 +22,7 @@ export default function AppLayout() {
             </header>
 
 
-            <main className="max-w-4xl w-full mx-auto p-6 grow">
+            <main className="max-w-5xl w-full mx-auto p-6 grow">
                 <Outlet />
             </main>
 

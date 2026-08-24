@@ -1,0 +1,47 @@
+import { getProjectById } from "@/services/ProjectService";
+import { useQuery } from "@tanstack/react-query";
+import { Navigate, useNavigate, useParams } from "react-router-dom"
+import Spinner from "../Spinner";
+import AddTaskModal from "../tasks/AddTaskModal";
+import TaskList from "../tasks/TaskList";
+import EditTaskData from "../tasks/EditTaskData";
+
+
+export default function ProjectDetailsView() {
+  const params = useParams();
+  const projectId = params.projectId!;
+  const navigate = useNavigate();
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["editProject", projectId],
+    queryFn: () => getProjectById(projectId),
+    retry: false
+  })
+
+  if (isError) return <Navigate to={"/404"} />;
+  if (isLoading) return <Spinner size="lg" label="Cargando datos del proyecto" />
+  if (data) return (
+
+    <>
+      <h1 className="text-5xl font-semibold">{data.projectName}</h1>
+      <p className="text-2xl font-light text-gray-500 my-5">{data.description}</p>
+
+      <nav className="my-5 gap-3">
+        <button
+          type="button"
+          className="uppercase bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-indigo-500/20 transition-all duration-200 cursor-pointer"
+          onClick={() => navigate(location.pathname + "?newTask=true")}
+        >
+          Agregar Tarea
+        </button>
+      </nav>
+
+      <TaskList
+        tasks={data.tasks}
+      />
+
+      <AddTaskModal />
+      <EditTaskData/>
+    </>
+  )
+}
