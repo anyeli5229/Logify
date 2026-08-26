@@ -5,6 +5,7 @@ import Spinner from "../Spinner";
 import AddTaskModal from "../tasks/AddTaskModal";
 import TaskList from "../tasks/TaskList";
 import EditTaskData from "../tasks/EditTaskData";
+import TaskModalDetails from "../tasks/TaskModalDetails";
 
 
 export default function ProjectDetailsView() {
@@ -42,6 +43,7 @@ export default function ProjectDetailsView() {
 
       <AddTaskModal />
       <EditTaskData/>
+      <TaskModalDetails/>
     </>
   )
 }

@@ -4,7 +4,7 @@ import './index.css'
 import Router from './router'
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
-import '@/lib/mock';
+//import '@/lib/mock';
 
 const queryClient = new QueryClient();
 

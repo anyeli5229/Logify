@@ -20,7 +20,7 @@ export default function TaskCard({ task }: TaskCardProps) {
         mutationFn: deleteTask,
         onSuccess: (data) => {
             toast.success(data.message);
-            queryClient.invalidateQueries({queryKey: ["editProject", projectId]})
+            queryClient.invalidateQueries({ queryKey: ["editProject", projectId] })
         },
         onError: (data) => {
             toast.error(data.message);
@@ -30,7 +30,10 @@ export default function TaskCard({ task }: TaskCardProps) {
     return (
         <li className="p-3.5 bg-white rounded-xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 space-y-1.5 group relative flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-                <h4 className="font-bold text-slate-800 text-sm leading-snug line-clamp-2 group-hover:text-purple-600 transition-colors">
+
+                <h4
+                    onClick={() => navigate(location.pathname + `?viewTask=${task.id}`)}
+                    className="font-bold text-slate-800 text-sm leading-snug line-clamp-2 hover:cursor-pointer group-hover:text-purple-600 transition-colors">
                     {task.name}
                 </h4>
                 {task.description && (
@@ -88,7 +91,7 @@ export default function TaskCard({ task }: TaskCardProps) {
                         <MenuItem>
                             <button
                                 type="button"
-                                onClick={() => mutate({projectId, taskId: task.id})}
+                                onClick={() => mutate({ projectId, taskId: task.id })}
                                 className="hover:bg-red-50  hover:text-red-700 text-red-600 flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 cursor-pointer"
                             >
                                 <svg className="w-3.5 h-3.5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

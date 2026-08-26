@@ -3,7 +3,7 @@ import MockAdapter from "axios-mock-adapter";
 
 const mock = new MockAdapter(api, { delayResponse: 500 });
 
-// 1. Simular la lista general de proyectos (para DashboardView)
+// Simular la lista general de proyectos
 mock.onGet("/projects").reply(200, [
   {
     id: "1",
@@ -21,8 +21,31 @@ mock.onGet("/projects").reply(200, [
   }
 ]);
 
-// 2. Simular el detalle de un proyecto por ID (para ProjectDetailsView)
-mock.onGet(/\/projects\/.+/).reply(200, {
+// REGLA ESPECÍFICA DE TAREAS PRIMERO
+// (Debe ir ANTES de la regla genérica de proyectos para que no la atrape primero)
+mock.onGet(/\/projects\/[^/]+\/tasks\/[^/]+$/).reply((config) => {
+  const taskId = config.url?.split('/').pop();
+
+  if (taskId === 'not-found') {
+    return [404, { error: 'La tarea no existe o fue eliminada' }];
+  }
+
+  return [
+    200,
+    {
+      id: taskId || 't1',
+      name: 'Diseñar interfaz de tareas',
+      description: 'Crear componentes de TaskList y TaskCard en React con Tailwind.',
+      proyect_id: '1',
+      status: 'IN_PROGRESS',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    },
+  ];
+});
+
+// Simular el detalle de un proyecto por ID (REGLA GENÉRICA ABAJO)
+mock.onGet(/\/projects\/[^/]+$/).reply(200, {
   id: "1",
   projectName: "Proyecto de Prueba (Mock)",
   clientName: "Cliente Ejemplo",
@@ -31,7 +54,7 @@ mock.onGet(/\/projects\/.+/).reply(200, {
     {
       id: "t1",
       name: "Diseñar interfaz de tareas",
-      description: "Crear componentes de TaskList y TaskCard",
+      description: "Crear componentes of TaskList y TaskCard",
       proyect_id: "1",
       status: "IN_PROGRESS"
     },
@@ -43,23 +66,30 @@ mock.onGet(/\/projects\/.+/).reply(200, {
       status: "PENDING"
     }
   ]
-})
-
-// Simular GET de una tarea individual
-mock.onGet(/\/projects\/.+\/tasks\/.+/).reply(200, {
-  id: "t1",
-  name: "Diseñar interfaz de tareas",
-  description: "Crear componentes de TaskList y TaskCard",
-  proyect_id: "1",
-  status: "IN_PROGRESS"
 });
 
-// Simular PUT/PATCH para actualizar tarea
+// PUT y DELETE de tareas
 mock.onPut(/\/projects\/.+\/tasks\/.+/).reply(200, {
   message: "Tarea actualizada correctamente"
 });
 
-// Simular DELETE para eliminar tarea
 mock.onDelete(/\/projects\/.+\/tasks\/.+/).reply(200, {
   message: "Tarea eliminada correctamente"
+});
+
+// Actualizar únicamente el estado de una tarea
+mock.onPost(/\/projects\/[^/]+\/tasks\/[^/]+\/status$/).reply((config) => {
+  const { status } = JSON.parse(config.data || '{}');
+
+  if (!status) {
+    return [400, { error: "El nuevo estado es requerido" }];
+  }
+
+  return [
+    200,
+    {
+      message: "Estado de la tarea actualizado correctamente",
+      status
+    }
+  ];
 });
