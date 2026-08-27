@@ -44,13 +44,25 @@ model Task {
 }
 
 model User {
-  id        String  @id @default(uuid())
+  id        String   @id @default(uuid())
   name      String
-  email     String
+  email     String   @unique
   password  String
-  confirmed Boolean @default(false)
+  confirmed Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  tokens Token[]
 
   @@map("users")
+}
+
+model Token {
+  id        String   @id @default(uuid())
+  token     String
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  expiresAt DateTime @map("expires_at")
+
+  @@map("tokens")
 }
