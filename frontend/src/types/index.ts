@@ -1,4 +1,19 @@
-import z from "zod";
+import z, { email, string } from "zod";
+
+/* AUTH  */
+export const authSchema = z.object({
+  name: string(),
+  email: email(),
+  password: string(),
+  password_confirmation: string(),
+  token: z.string()
+});
+export type Auth = z.infer<typeof authSchema>;
+export type LoginForm = Pick<Auth, "email" | "password">;
+export type RegisterForm = Pick<Auth, "name" | "email" | "password" | "password_confirmation">;
+export type InputToken = Pick<Auth, "token">;
+export type InputEmail = Pick<Auth, "email">;
+export type NewPasswordForm = Pick<Auth,"password" | "password_confirmation">;
 
 /* TAREAS */
 
