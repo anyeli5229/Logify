@@ -26,10 +26,34 @@ model Project {
 
   tasks Task[]
 
-  userId      String   @map("user_id")
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // Relación Propietario / Creador
+  userId String @map("user_id")
+  user   User   @relation("Manager", fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relación Equipo / Colaboradores
+  team User[] @relation("ProjectTeam")
 
   @@map("projects")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  confirmed Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tokens Token[]
+
+  //  Proyectos creados por este usuario
+  projects Project[] @relation("Manager")
+
+  // Proyectos donde este usuario es parte del equipo
+  memberOfProjects Project[] @relation("ProjectTeam")
+
+  @@map("users")
 }
 
 model Task {
@@ -44,20 +68,6 @@ model Task {
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@map("tasks")
-}
-
-model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  confirmed Boolean  @default(false)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  tokens Token[]
-  projects  Project[]
-
-  @@map("users")
 }
 
 model Token {

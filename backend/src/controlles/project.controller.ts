@@ -9,7 +9,10 @@ export class ProjectController {
         try {
             const projects = await prisma.project.findMany({
                 where: { userId: req.usuario.id },
-                orderBy: { createdAt: "desc" }
+                orderBy: { createdAt: "desc" },
+                include: {
+                    tasks: true
+                }
             });
 
             res.json(projects);

@@ -1,10 +1,26 @@
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import Logo from "@/components/Logo";
 import NavMenu from "@/components/NavMenu";
 import { Toaster } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
+import Spinner from "@/components/Spinner";
 
 export default function AppLayout() {
-    return (
+
+    const { data, isLoading, isError } = useAuth();
+
+    if (isError) return <Navigate to={"/auth/login"} />
+
+    if (isLoading) {
+        return (
+            <div className="min-h-100 flex items-center justify-center">
+                <Spinner size="lg" label="Cargando..." />
+            </div>
+        )
+    }
+
+
+    if(data) return (
         <div className="min-h-screen flex flex-col font-sans">
 
             <Toaster position="top-right" richColors />
@@ -16,7 +32,7 @@ export default function AppLayout() {
                         <Logo />
                     </div>
 
-                    <NavMenu />
+                    <NavMenu name={data.name}/>
 
                 </div>
             </header>

@@ -23,6 +23,9 @@ export const LoginSchema = z.object({
 export const EmailSchema = z.object({
     email: z.email("Ingresa un email válido")
 });
+export const idSchema = z.object({
+    id: z.uuid("Ingresa un id válido")
+});
 export const updatePasswordSchema =  z.object({
     password: z.string().trim().min(8, "La contraseña debe de contener mínimo 8 caracteres"),
     password_confirmation: z.string().trim().min(1, "Debes confirmar tu contraseña"),

@@ -1,6 +1,7 @@
 import { Router } from "express"
 import { AuthController } from "../controlles/auth.controller";
 import { validateToken } from "../middlewares/validation.middleware";
+import { autentificacion } from "../middlewares/auth.middleware";
 
 const router = Router();
 
@@ -13,5 +14,6 @@ router.post("/request-code", AuthController.requestConfirmCode);
 router.post("/forgot-password", AuthController.forgotPassword);
 router.post("/validate-token", AuthController.validateToken);
 router.post("/update-password/:token", AuthController.updatePassword);
+router.get("/user", autentificacion, AuthController.user);
 
 export default router;

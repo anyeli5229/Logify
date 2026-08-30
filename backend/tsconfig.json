@@ -6,6 +6,7 @@
     "lib": ["esnext"],
     "outDir": "./dist",
     "rootDir": "./src",
+    "typeRoots": ["./node_modules/@types", "./src/types"],
     
     /* Configuración para tsx y desarrollo moderno */
     "esModuleInterop": true,

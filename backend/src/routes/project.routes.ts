@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { ProjectController } from "../controlles/project.controllers";
+import { ProjectController } from "../controlles/project.controller";
 import { validateId } from "../middlewares/validation.middleware";
 import { TaskController } from "../controlles/task.controller";
 import { validateProjectExist } from "../middlewares/project.middleware";
 import { validateTaskExist } from "../middlewares/task.middleware";
 import { autentificacion } from "../middlewares/auth.middleware";
+import { TeamController } from "../controlles/team.controller";
 
 const router = Router();
 
@@ -30,5 +31,11 @@ router.get("/:projectId/tasks/:taskId", TaskController.getTaskById);
 router.put("/:projectId/tasks/:taskId", TaskController.updateTaskById);
 router.delete("/:projectId/tasks/:taskId", TaskController.deleteTaskById);
 router.post("/:projectId/tasks/:taskId/status", TaskController.updateStatusTask);
+
+/* TEAM */
+router.post("/:projectId/team/find", TeamController.findMemberByEmail);
+router.post("/:projectId/team", TeamController.addMemberById);
+router.delete("/:projectId/team", TeamController.deleteMemberById);
+router.get("/:projectId/team", TeamController.getProjectTeam);
 
 export default router;
