@@ -5,8 +5,8 @@ import { Project, Task } from "@prisma/client";
 declare global {
     namespace Express {
         interface Request {
-            project: Project,
-            task: Task
+            project?: Project,
+            task?: Task
         }
     }
 }
@@ -14,9 +14,15 @@ declare global {
 export async function validateProjectExist(req: Request, res: Response, next: NextFunction, projectId: string) {
     try {
 
-        const project = await prisma.project.findUnique({
+        if (!req.usuario) {
+            res.status(401).json({ error: "Usuario no autenticado" });
+            return;
+        }
+
+        const project = await prisma.project.findFirst({
             where: { 
-                id: projectId
+                id: projectId,
+                userId: req.usuario.id
             }
         });
 
@@ -26,6 +32,7 @@ export async function validateProjectExist(req: Request, res: Response, next: Ne
         }
 
         req.project = project;
+
         next();
     } catch (error) {
         res.status(500).json({ error: "Hubo un error" });

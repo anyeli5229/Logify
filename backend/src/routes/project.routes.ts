@@ -4,8 +4,11 @@ import { validateId } from "../middlewares/validation.middleware";
 import { TaskController } from "../controlles/task.controller";
 import { validateProjectExist } from "../middlewares/project.middleware";
 import { validateTaskExist } from "../middlewares/task.middleware";
+import { autentificacion } from "../middlewares/auth.middleware";
 
 const router = Router();
+
+router.use(autentificacion);
 
 router.param("id", validateId);
 router.param("projectId", validateId);
@@ -16,9 +19,9 @@ router.param("taskId", validateTaskExist);
 
 router.get("/", ProjectController.getAllProjects);
 router.post("/", ProjectController.createProject);
-router.get("/:id", ProjectController.getProjectById);
-router.put("/:id", ProjectController.updateProject);
-router.delete("/:id", ProjectController.deleteProject);
+router.get("/:projectId", ProjectController.getProjectById);
+router.put("/:projectId", ProjectController.updateProject);
+router.delete("/:projectId", ProjectController.deleteProject);
 
 /* TASKS */
 router.get("/:projectId/tasks", TaskController.getAllTasks);

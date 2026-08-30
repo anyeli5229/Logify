@@ -8,9 +8,11 @@ export class ProjectController {
     static getAllProjects = async (req: Request, res: Response) => {
         try {
             const projects = await prisma.project.findMany({
+                where: { userId: req.usuario.id },
                 orderBy: { createdAt: "desc" }
-            })
-            res.json(projects)
+            });
+
+            res.json(projects);
         } catch (error) {
             res.status(500).json({ error: 'Error al obtener los proyectos' });
         }
@@ -25,8 +27,11 @@ export class ProjectController {
             }
 
             await prisma.project.create({
-                data: validation.data
-            })
+                data: {
+                    ...validation.data,
+                    userId: req.usuario.id
+                }
+            });
 
             res.status(201).json({ message: "Proyecto creado correctamente" });
         } catch (error) {
@@ -34,50 +39,23 @@ export class ProjectController {
         }
     }
 
-    static getProjectById = async (req: Request<{ id: string }>, res: Response) => {
-        try {
-            const { id } = req.params;
-            const project = await prisma.project.findUnique({
-                where: { id },
-                include: {
-                    tasks: true
-                }
-            })
-
-            if (!project) {
-                res.status(404).json({ error: 'Proyecto no encontrado' });
-                return;
-            }
-
-            res.json(project);
-        } catch (error) {
-            res.status(500).json({ error: 'Error al obtener el proyecto' });
-        }
+    static getProjectById = async (req: Request, res: Response) => {
+        // req.project ya fue cargado por el middleware
+        res.json(req.project);
     }
 
-    static updateProject = async (req: Request<{ id: string }>, res: Response) => {
+    static updateProject = async (req: Request, res: Response) => {
         try {
-            const { id } = req.params;
-
-            const project = await prisma.project.findUnique({
-                where: { id }
-            });
-
-            if (!project) {
-                res.status(404).json({ error: 'Proyecto no encontrado' });
-                return;
-            }
-
             const validation = createProjectSchema.safeParse(req.body);
             if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) })
+                res.status(400).json({ error: formatearErroresZod(validation.error) });
                 return;
             }
 
             await prisma.project.update({
-                where: { id },
+                where: { id: req.project.id },
                 data: validation.data
-            })
+            });
 
             res.json({ message: "Proyecto actualizado correctamente" });
         } catch (error) {
@@ -85,26 +63,15 @@ export class ProjectController {
         }
     }
 
-    static deleteProject = async (req: Request<{ id: string }>, res: Response) => {
+    static deleteProject = async (req: Request, res: Response) => {
         try {
-            const { id } = req.params;
-            const project = await prisma.project.findUnique({
-                where: { id }
-            });
-            if (!project) {
-                res.status(404).json({ error: "Proyecto no encontrado" });
-                return;
-            }
-
             await prisma.project.delete({
-                where: { id }
+                where: { id: req.project.id }
             });
 
             res.json({ message: "Proyecto eliminado correctamente" });
         } catch (error) {
-            res.status(500).json({ error: "Error al eliminar el proyecto" })
+            res.status(500).json({ error: "Error al eliminar el proyecto" });
         }
-
     }
-
 }

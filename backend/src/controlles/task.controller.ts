@@ -47,35 +47,7 @@ export class TaskController {
     }
 
     static getTaskById = async (req: Request<{ projectId: string; taskId: string }>, res: Response) => {
-        try {
-            const { taskId } = req.params;
-
-            const task = await prisma.task.findFirst({
-                where: {
-                    id: taskId,
-                    projectId: req.project.id//Verificar que el pertenezca al proyecto
-                },
-                include: {
-                    project: {
-                        select: {
-                            id: true,
-                            projectName: true,
-                            clientName: true
-                        }
-                    }
-                }
-            });
-
-            if (!task) {
-                res.status(404).json({ error: "Tarea no encontrada en este proyecto" });
-                return;
-            }
-
-            res.json(task);
-
-        } catch (error) {
-            res.status(500).json({ error: "Error al obtener la tarea" });
-        }
+        res.json(req.task);
     }
 
     static updateTaskById = async (req: Request<{ projectId: string; taskId: string }>, res: Response) => {

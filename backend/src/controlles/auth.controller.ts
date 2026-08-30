@@ -4,6 +4,7 @@ import { formatearErroresZod } from "../utils/zodErrors";
 import { buscarUsuario, generarToken, hashPassword, verificarPassword } from "../utils/auth";
 import { prisma } from "../config/prisma";
 import { AuthEmail } from "../emails/auth.email";
+import { generarJWT } from "../utils/jwt";
 
 export class AuthController {
 
@@ -131,7 +132,8 @@ export class AuthController {
                 return;
             }
 
-            res.status(200).json({ message: "Usuario autenticado correctamente" });
+            const token = generarJWT({id: usuario.id});
+            res.json(token);
 
         } catch (error) {
             console.error(error);
