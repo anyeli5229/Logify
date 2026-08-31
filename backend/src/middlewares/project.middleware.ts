@@ -11,6 +11,7 @@ declare global {
     namespace Express {
         interface Request {
             project: ProjectWithRelations;
+            task?: Task
         }
     }
 }

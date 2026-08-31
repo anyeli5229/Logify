@@ -76,3 +76,13 @@ export const userSchema = authSchema.pick({
   id: z.string()
 });
 export type User = z.infer<typeof userSchema>;
+
+/* TEAM */
+export const TeamMemberSchema = userSchema.pick({
+  id: true,
+  name: true,
+  email: true
+});
+export const TeamMembersSchema = z.array(TeamMemberSchema);
+export type TeamMember = z.infer<typeof TeamMemberSchema>;
+export type TeamMemberForm = Pick<TeamMember, "email">;

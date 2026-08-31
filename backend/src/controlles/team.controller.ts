@@ -79,16 +79,11 @@ export class TeamController {
         }
     }
 
-    static deleteMemberById = async (req: Request, res: Response) => {
+    static deleteMemberById = async (req: Request<{id: string}>, res: Response) => {
         try {
-            const validation = idSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) });
-                return;
-            }
 
             const usuario = await prisma.user.findUnique({
-                where: { id: validation.data.id },
+                where: { id: req.params.id },
                 select: {
                     id: true
                 }

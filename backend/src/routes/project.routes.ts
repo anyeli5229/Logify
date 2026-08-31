@@ -35,7 +35,7 @@ router.post("/:projectId/tasks/:taskId/status", TaskController.updateStatusTask)
 /* TEAM */
 router.post("/:projectId/team/find", TeamController.findMemberByEmail);
 router.post("/:projectId/team", TeamController.addMemberById);
-router.delete("/:projectId/team", TeamController.deleteMemberById);
+router.delete("/:projectId/team/:id", TeamController.deleteMemberById);
 router.get("/:projectId/team", TeamController.getProjectTeam);
 
 export default router;
