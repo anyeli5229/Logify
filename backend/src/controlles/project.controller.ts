@@ -8,10 +8,22 @@ export class ProjectController {
     static getAllProjects = async (req: Request, res: Response) => {
         try {
             const projects = await prisma.project.findMany({
-                where: { userId: req.usuario.id },
+                where:
+                {
+                    OR: [
+                        { userId: req.usuario.id },
+                        { team: { some: { id: req.usuario.id } } }
+                    ]
+                },
                 orderBy: { createdAt: "desc" },
                 include: {
-                    tasks: true
+                    tasks: true,
+                    team: {
+                        select: { id: true, name: true, email: true }
+                    },
+                    manager: {
+                        select: { id: true, name: true, email: true }
+                    }
                 }
             });
 

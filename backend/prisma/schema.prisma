@@ -28,7 +28,7 @@ model Project {
 
   // Relación Propietario / Creador
   userId String @map("user_id")
-  user   User   @relation("Manager", fields: [userId], references: [id], onDelete: Cascade)
+  manager   User   @relation("Manager", fields: [userId], references: [id], onDelete: Cascade)
 
   // Relación Equipo / Colaboradores
   team User[] @relation("ProjectTeam")

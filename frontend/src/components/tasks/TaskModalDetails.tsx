@@ -30,26 +30,25 @@ export default function TaskModalDetails() {
         mutationFn: updateStatus,
         onSuccess: (data) => {
             toast.success(data.message);
-            queryClient.invalidateQueries({queryKey: ["task", taskId]});
-            queryClient.invalidateQueries({queryKey: ["editProject", projectId]})
-            navigate(location.pathname, {replace: true})
+            queryClient.invalidateQueries({ queryKey: ["task", taskId] });
+            queryClient.invalidateQueries({ queryKey: ["editProject", projectId] });
+            navigate(location.pathname, { replace: true });
         },
         onError: (data) => {
             toast.error(data.message);
         }
-    })
+    });
 
     const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
         const status = e.target.value as TaskStatus;
-        const data = { projectId, taskId, status}
-        mutate(data)
-    }
+        const data = { projectId, taskId, status };
+        mutate(data);
+    };
 
     if (isError && error) {
         toast.error(error.message, { toasterId: "error" });
-        return <Navigate to={`/projects/${projectId}`} />
+        return <Navigate to={`/projects/${projectId}`} />;
     }
-
 
     if (!taskId || !data) return null;
 
@@ -59,6 +58,7 @@ export default function TaskModalDetails() {
     return (
         <Transition appear show={show} as={Fragment}>
             <Dialog as="div" className="relative z-50" onClose={() => navigate(location.pathname, { replace: true })}>
+                {/* Backdrop neutro con blur */}
                 <TransitionChild
                     as={Fragment}
                     enter="ease-out duration-300"
@@ -68,65 +68,92 @@ export default function TaskModalDetails() {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs" />
+                    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" />
                 </TransitionChild>
 
                 <div className="fixed inset-0 overflow-y-auto">
-                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                    <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-6">
                         <TransitionChild
                             as={Fragment}
                             enter="ease-out duration-300"
-                            enterFrom="opacity-0 scale-95"
-                            enterTo="opacity-100 scale-100"
+                            enterFrom="opacity-0 scale-95 translateY(4px)"
+                            enterTo="opacity-100 scale-100 translateY(0)"
                             leave="ease-in duration-200"
-                            leaveFrom="opacity-100 scale-100"
-                            leaveTo="opacity-0 scale-95"
+                            leaveFrom="opacity-100 scale-100 translateY(0)"
+                            leaveTo="opacity-0 scale-95 translateY(4px)"
                         >
-                            <DialogPanel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-2xl transition-all border border-slate-100">
-                                <div className="p-6 flex items-center justify-between gap-4 mt-5">
-                                    <div>
-                                        <DialogTitle as="h3" className="font-semibold text-3xl text-slate-800">
+                            <DialogPanel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-2xl transition-all">
+                                
+                                {/* Acento visual superior (Línea con gradiente igual a tus botones) */}
+                                <div className="h-2 w-full bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600" />
+
+                                {/* Header */}
+                                <div className="p-6 border-b border-slate-100 flex items-start justify-between gap-4">
+                                    <div className="space-y-1">
+                                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                            Detalles de la tarea
+                                        </p>
+                                        <DialogTitle as="h3" className="font-bold text-2xl text-slate-800 tracking-tight leading-snug">
                                             {data.name}
                                         </DialogTitle>
                                     </div>
 
-                                    <span className={`text-xs font-mono font-semibold uppercase tracking-wider ${currentStatusStyle} border-none`}>
+                                    <span className={`shrink-0 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider border ${currentStatusStyle}`}>
                                         {currentStatusTranslation}
                                     </span>
                                 </div>
 
-                                <div className="p-6 space-y-4">
+                                {/* Body */}
+                                <div className="p-6 space-y-6">
+                                    {/* Descripción */}
                                     <div>
-                                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
                                             Descripción
                                         </h4>
-                                        <p className="text-slate-600 text-sm p-4">
-                                            {data.description}
-                                        </p>
+                                        <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                                            <p className="text-slate-600 text-sm leading-relaxed whitespace-pre-wrap">
+                                                {data.description || "Sin descripción disponible."}
+                                            </p>
+                                        </div>
                                     </div>
 
-                                    <div className='space-y-3'>
-                                        <label className='p-1 text-xs font-bold uppercase tracking-wider text-slate-400'>Cambiar estado:</label>
-                                        <select
-                                            defaultValue={data.status}
-                                            onChange={handleChange}
-                                            className='w-full p-3 bg-white rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent'
-                                        >{Object.entries(statusTranslations).map(([key, value]) => (
-                                            <option value={key} key={key}>{value}</option>
-                                        ))}</select>
+                                    {/* Selector de Estado */}
+                                    <div className="space-y-2">
+                                        <label htmlFor="status-select" className="block text-xs font-bold uppercase tracking-wider text-slate-400">
+                                            Cambiar estado
+                                        </label>
+                                        <div className="relative">
+                                            <select
+                                                id="status-select"
+                                                defaultValue={data.status}
+                                                onChange={handleChange}
+                                                className="w-full appearance-none p-3.5 pr-10 bg-white rounded-xl border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-all cursor-pointer shadow-xs hover:border-slate-300"
+                                            >
+                                                {Object.entries(statusTranslations).map(([key, value]) => (
+                                                    <option value={key} key={key} className="text-slate-700">{value}</option>
+                                                ))}
+                                            </select>
+                                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                                                <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                                                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                                                </svg>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="mb-5 px-6 py-4 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-2">
+                                {/* Footer con Metadatos */}
+                                <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-4">
                                     <div className="flex items-center gap-1.5">
                                         <span className="font-medium text-slate-400">Creada:</span>
                                         <time className="font-semibold text-slate-700">{formatDate(data.createdAt)}</time>
                                     </div>
                                     <div className="flex items-center gap-1.5">
-                                        <span className="font-medium text-slate-400">Actualizada:</span>
+                                        <span className="font-medium text-slate-400">Última actualización:</span>
                                         <time className="font-semibold text-slate-700">{formatDate(data.updatedAt)}</time>
                                     </div>
                                 </div>
+
                             </DialogPanel>
                         </TransitionChild>
                     </div>

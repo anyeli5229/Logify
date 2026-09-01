@@ -5,11 +5,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
 export default function DashboardView() {
-
   const { data, isLoading } = useQuery({
     queryKey: ["projects"],
     queryFn: getAllProjects
   })
+
 
   if (isLoading) {
     return (
@@ -49,7 +49,7 @@ export default function DashboardView() {
         </nav>
       </div>
 
-      {data.length ? (
+      {data.length ? ( 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {data.map((project) => (
             <ProjectCard

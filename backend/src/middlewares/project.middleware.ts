@@ -2,16 +2,19 @@ import type { Request, Response, NextFunction } from "express";
 import { prisma } from "../config/prisma";
 import { Project, Task, User } from "@prisma/client";
 
+type UserSimple = Pick<User, 'id' | 'name' | 'email'>;
+
 export type ProjectWithRelations = Project & {
     tasks: Task[];
-    team: Pick<User, 'id' | 'name' | 'email'>[];
+    team: UserSimple[];
+    manager: UserSimple;
 };
 
 declare global {
     namespace Express {
         interface Request {
             project: ProjectWithRelations;
-            task?: Task
+            task?: Task;
         }
     }
 }
@@ -33,7 +36,9 @@ export async function validateProjectExist(req: Request, res: Response, next: Ne
                 ]
             },
             include: {
-                user: true, //Datos del colaborador
+                manager: { //Datos del colaborador
+                    select: { id: true, name: true, email: true }
+                },
                 tasks: true, //Tareas del proyecto
                 team: { //Lista de colaboradores
                     select: { id: true, name: true, email: true }
@@ -52,4 +57,12 @@ export async function validateProjectExist(req: Request, res: Response, next: Ne
     } catch (error) {
         res.status(500).json({ error: "Hubo un error" });
     }
+}
+
+export async function hasAuthorization(req: Request, res: Response, next: NextFunction) {
+    if (req.usuario.id !== req.project.userId) {
+        res.status(401).json({ error: "Acción no válida: Solo el Manager puede realizar esta acción" });
+        return;
+    }
+    next();
 }

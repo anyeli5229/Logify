@@ -11,16 +11,16 @@ export async function validateTaskExist(req: Request, res: Response, next: NextF
             }
         });
 
-        if(!task) {
-            res.status(404).json({error: "Tarea no encontrada"});
+        if (!task) {
+            res.status(404).json({ error: "Tarea no encontrada" });
             return;
         }
 
         req.task = task;
 
         next();
-        
+
     } catch (error) {
-        res.status(500).json({error: "Hubo un error"});
+        res.status(500).json({ error: "Hubo un error" });
     }
 }

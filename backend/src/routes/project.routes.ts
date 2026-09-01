@@ -2,7 +2,7 @@ import { Router } from "express";
 import { ProjectController } from "../controlles/project.controller";
 import { validateId } from "../middlewares/validation.middleware";
 import { TaskController } from "../controlles/task.controller";
-import { validateProjectExist } from "../middlewares/project.middleware";
+import { hasAuthorization, validateProjectExist } from "../middlewares/project.middleware";
 import { validateTaskExist } from "../middlewares/task.middleware";
 import { autentificacion } from "../middlewares/auth.middleware";
 import { TeamController } from "../controlles/team.controller";
@@ -26,10 +26,10 @@ router.delete("/:projectId", ProjectController.deleteProject);
 
 /* TASKS */
 router.get("/:projectId/tasks", TaskController.getAllTasks);
-router.post("/:projectId/tasks", TaskController.createTask);
+router.post("/:projectId/tasks", hasAuthorization, TaskController.createTask);
 router.get("/:projectId/tasks/:taskId", TaskController.getTaskById);
-router.put("/:projectId/tasks/:taskId", TaskController.updateTaskById);
-router.delete("/:projectId/tasks/:taskId", TaskController.deleteTaskById);
+router.put("/:projectId/tasks/:taskId", hasAuthorization, TaskController.updateTaskById);
+router.delete("/:projectId/tasks/:taskId", hasAuthorization, TaskController.deleteTaskById);
 router.post("/:projectId/tasks/:taskId/status", TaskController.updateStatusTask);
 
 /* TEAM */
