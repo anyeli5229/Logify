@@ -24,9 +24,7 @@ export async function createTask({ formData, projectId }: Pick<TaskType, "formDa
 export async function getTaskById({ projectId, taskId }: { projectId: string; taskId: string }) {
     try {
         const { data } = await api(`/projects/${projectId}/tasks/${taskId}`);
-        
-        const response = taskSchema.safeParse(data);
-        
+        const response = taskSchema.safeParse(data);        
         if (response.success) {
             return response.data;
         } 

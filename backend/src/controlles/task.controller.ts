@@ -47,7 +47,26 @@ export class TaskController {
     }
 
     static getTaskById = async (req: Request<{ projectId: string; taskId: string }>, res: Response) => {
-        res.json(req.task);
+        try {
+            const task = await prisma.task.findUnique({
+                where: {
+                    id: req.task.id
+                },
+                include: {
+                    history: {
+                        orderBy: { updatedAt: 'desc' },
+                        include: {
+                            user: {
+                                select: { id: true, name: true, email: true }
+                            }
+                        }
+                    }
+                }
+            });
+            res.json(task);
+        } catch (error) {
+            res.status(500).json({ error: "Error al obtener la tarea" });
+        }
     }
 
     static updateTaskById = async (req: Request<{ projectId: string; taskId: string }>, res: Response) => {
@@ -98,14 +117,25 @@ export class TaskController {
                 return;
             }
 
-            await prisma.task.update({
+            const { status } = validation.data;
+
+            await prisma.task.update({//Actualizar estado 
                 where: {
                     id: req.task.id
                 },
                 data: {
-                    status: validation.data.status
+                    status
                 }
-            })
+            });
+
+            //Historial de cambios
+            await prisma.taskHistory.create({
+                data: {
+                    status,
+                    taskId: req.task.id,
+                    userId: req.usuario.id
+                }
+            });
 
             res.json({ message: "Estado de la tarea actualizado correctamente" });
 

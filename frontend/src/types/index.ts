@@ -40,6 +40,15 @@ export type TeamMemberForm = Pick<TeamMember, "email">;
 export const taskStatusSchema = z.enum(["PENDING", "ON_HOLD", "IN_PROGRESS", "UNDER_REVIEW", "COMPLETED"]);
 export type TaskStatus = z.infer<typeof taskStatusSchema>;
 
+export const taskHistorySchema = z.object({
+  id: z.string(),
+  status: taskStatusSchema,
+  // taskId: z.string(),
+  // userId: z.string(), //Estos datos vienen de las consultas pero no son necesarios
+  updatedAt: z.string(),
+  user: userSchema
+});
+
 export const taskSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -56,7 +65,9 @@ export const taskSchema = z.object({
     id: z.string(),
     projectName: z.string(),
     clientName: z.string()
-  }).optional()
+  }).optional(),
+
+  history: z.array(taskHistorySchema).optional().default([])
 });
 
 export type Task = z.infer<typeof taskSchema>;

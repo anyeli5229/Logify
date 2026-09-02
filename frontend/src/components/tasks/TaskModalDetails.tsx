@@ -58,7 +58,6 @@ export default function TaskModalDetails() {
     return (
         <Transition appear show={show} as={Fragment}>
             <Dialog as="div" className="relative z-50" onClose={() => navigate(location.pathname, { replace: true })}>
-                {/* Backdrop neutro con blur */}
                 <TransitionChild
                     as={Fragment}
                     enter="ease-out duration-300"
@@ -82,12 +81,9 @@ export default function TaskModalDetails() {
                             leaveFrom="opacity-100 scale-100 translateY(0)"
                             leaveTo="opacity-0 scale-95 translateY(4px)"
                         >
-                            <DialogPanel className="w-full max-w-xl transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-2xl transition-all">
-                                
-                                {/* Acento visual superior (Línea con gradiente igual a tus botones) */}
+                            <DialogPanel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-2xl transition-all">
                                 <div className="h-2 w-full bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600" />
-
-                                {/* Header */}
+                                
                                 <div className="p-6 border-b border-slate-100 flex items-start justify-between gap-4">
                                     <div className="space-y-1">
                                         <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
@@ -103,9 +99,7 @@ export default function TaskModalDetails() {
                                     </span>
                                 </div>
 
-                                {/* Body */}
-                                <div className="p-6 space-y-6">
-                                    {/* Descripción */}
+                                <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
                                     <div>
                                         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
                                             Descripción
@@ -117,7 +111,6 @@ export default function TaskModalDetails() {
                                         </div>
                                     </div>
 
-                                    {/* Selector de Estado */}
                                     <div className="space-y-2">
                                         <label htmlFor="status-select" className="block text-xs font-bold uppercase tracking-wider text-slate-400">
                                             Cambiar estado
@@ -140,9 +133,36 @@ export default function TaskModalDetails() {
                                             </div>
                                         </div>
                                     </div>
+
+                                    {/* Sección de Historial de Cambios */}
+                                    <div className="space-y-3 pt-4 border-t border-slate-100">
+                                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                                            Historial de cambios
+                                        </h4>
+
+                                        {data.history.length === 0 ? (
+                                            <p className="text-xs text-slate-400 italic">No hay historial registrado.</p>
+                                        ) : (
+                                            <ul className="space-y-3">
+                                                {data.history.map((item) => (
+                                                    <li key={item.id} className="text-xs bg-slate-50 p-3 rounded-lg border border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="font-semibold text-slate-700">{item.user.name}</span>
+                                                            <span className="text-slate-400">cambió el estado a</span>
+                                                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${statusStyles[item.status]}`}>
+                                                                {statusTranslations[item.status]}
+                                                            </span>
+                                                        </div>
+                                                        <time className="text-slate-400 font-medium">
+                                                            {formatDate(item.updatedAt)}
+                                                        </time>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
                                 </div>
 
-                                {/* Footer con Metadatos */}
                                 <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-4">
                                     <div className="flex items-center gap-1.5">
                                         <span className="font-medium text-slate-400">Creada:</span>
@@ -160,5 +180,5 @@ export default function TaskModalDetails() {
                 </div>
             </Dialog>
         </Transition>
-    )
+    );
 }
