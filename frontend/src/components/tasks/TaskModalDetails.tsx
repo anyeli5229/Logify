@@ -8,6 +8,7 @@ import { formatDate } from '@/utils/utils';
 import { statusTranslations } from '@/locales/es';
 import { statusStyles } from './TaskList';
 import type { TaskStatus } from '@/types';
+import NotesPanel from '../notes/NotesPanel';
 
 export default function TaskModalDetails() {
     const navigate = useNavigate();
@@ -83,7 +84,7 @@ export default function TaskModalDetails() {
                         >
                             <DialogPanel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-2xl transition-all">
                                 <div className="h-2 w-full bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600" />
-                                
+
                                 <div className="p-6 border-b border-slate-100 flex items-start justify-between gap-4">
                                     <div className="space-y-1">
                                         <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
@@ -135,14 +136,14 @@ export default function TaskModalDetails() {
                                     </div>
 
                                     {/* Sección de Historial de Cambios */}
-                                    <div className="space-y-3 pt-4 border-t border-slate-100">
-                                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                                            Historial de cambios
-                                        </h4>
 
-                                        {data.history.length === 0 ? (
-                                            <p className="text-xs text-slate-400 italic">No hay historial registrado.</p>
-                                        ) : (
+                                    {data.history.length === 0 ? (
+                                        null
+                                    ) : (
+                                        <div className="space-y-3 pt-4">
+                                            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                                                Historial de cambios
+                                            </h4>
                                             <ul className="space-y-3">
                                                 {data.history.map((item) => (
                                                     <li key={item.id} className="text-xs bg-slate-50 p-3 rounded-lg border border-slate-100 flex flex-wrap items-center justify-between gap-2">
@@ -159,11 +160,15 @@ export default function TaskModalDetails() {
                                                     </li>
                                                 ))}
                                             </ul>
-                                        )}
-                                    </div>
+                                        </div>
+                                    )}
+
+                                    <NotesPanel notes={data.notes} />
+                                    
                                 </div>
 
-                                <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-4">
+
+                                <div className="bg-slate-50 px-6 py-4 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-4">
                                     <div className="flex items-center gap-1.5">
                                         <span className="font-medium text-slate-400">Creada:</span>
                                         <time className="font-semibold text-slate-700">{formatDate(data.createdAt)}</time>

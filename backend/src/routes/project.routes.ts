@@ -6,6 +6,7 @@ import { hasAuthorization, validateProjectExist } from "../middlewares/project.m
 import { validateTaskExist } from "../middlewares/task.middleware";
 import { autentificacion } from "../middlewares/auth.middleware";
 import { TeamController } from "../controlles/team.controller";
+import { NoteController } from "../controlles/note.controller";
 
 const router = Router();
 
@@ -17,6 +18,8 @@ router.param("projectId", validateProjectExist);
 
 router.param("taskId", validateId);
 router.param("taskId", validateTaskExist);
+
+router.param("noteId", validateId);
 
 router.get("/", ProjectController.getAllProjects);
 router.post("/", ProjectController.createProject);
@@ -37,5 +40,10 @@ router.post("/:projectId/team/find", TeamController.findMemberByEmail);
 router.post("/:projectId/team", TeamController.addMemberById);
 router.delete("/:projectId/team/:id", TeamController.deleteMemberById);
 router.get("/:projectId/team", TeamController.getProjectTeam);
+
+/* NOTES */
+router.post("/:projectId/tasks/:taskId/notes", NoteController.createNote);
+router.get("/:projectId/tasks/:taskId/notes", NoteController.getAllNotes);
+router.delete("/:projectId/tasks/:taskId/notes/:noteId", NoteController.deleteNote);
 
 export default router;

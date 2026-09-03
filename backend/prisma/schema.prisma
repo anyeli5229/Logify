@@ -57,6 +57,8 @@ model User {
   // Relación con el historial de tareas
   taskHistories TaskHistory[]
 
+  notes Note[]
+
   @@map("users")
 }
 
@@ -74,7 +76,25 @@ model Task {
   // Relación para obtener todo el historial de cambios
   history TaskHistory[]
 
+  //Relación de notas
+  notes Note[]
+
   @@map("tasks")
+}
+
+model Note {
+  id        String     @id @default(uuid())
+  content String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  createdBy String @map("created_by")
+  user User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  taskId String @map("task_id")
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  @@map("notes")
 }
 
 model TaskHistory {

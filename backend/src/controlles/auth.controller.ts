@@ -136,7 +136,6 @@ export class AuthController {
             res.json(token);
 
         } catch (error) {
-            console.error(error);
             res.status(500).json({ error: 'Error al autenticar al usuario' });
         }
     }

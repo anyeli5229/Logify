@@ -34,3 +34,6 @@ export const updatePasswordSchema =  z.object({
     message: "Las contraseñas no son iguales",
     path: ["password_confirmation"]
 });
+export const noteSchema = z.object({
+    content: z.string().min(1, "Debes agregar el contenido de la nota")
+});

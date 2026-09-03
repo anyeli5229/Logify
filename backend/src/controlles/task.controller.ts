@@ -60,6 +60,14 @@ export class TaskController {
                                 select: { id: true, name: true, email: true }
                             }
                         }
+                    },
+                    notes: {
+                        orderBy: { updatedAt: 'desc'},
+                        include: {
+                            user: {
+                                select: { id: true, name: true, email: true}
+                            }
+                        }
                     }
                 }
             });
