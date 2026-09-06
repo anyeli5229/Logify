@@ -16,4 +16,9 @@ router.post("/validate-token", AuthController.validateToken);
 router.post("/update-password/:token", AuthController.updatePassword);
 router.get("/user", autentificacion, AuthController.user);
 
+/** Profile */
+router.put('/profile', autentificacion, AuthController.updateProfile)
+router.post('/update-password', autentificacion, AuthController.updateCurrentUserPassword);
+router.post('/check-password', autentificacion, AuthController.checkPassword);
+
 export default router;

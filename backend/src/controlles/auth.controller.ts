@@ -132,7 +132,7 @@ export class AuthController {
                 return;
             }
 
-            const token = generarJWT({id: usuario.id});
+            const token = generarJWT({ id: usuario.id });
             res.json(token);
 
         } catch (error) {
@@ -309,6 +309,162 @@ export class AuthController {
     static user = async (req: Request, res: Response) => {
         res.json(req.usuario);
         return;
+    }
+
+    static updateProfile = async (req: Request, res: Response) => {
+        try {
+            const validation = RegisterSchema.safeParse(req.body);
+            if (!validation.success) {
+                res.status(400).json({ error: formatearErroresZod(validation.error) });
+                return;
+            }
+
+            const usuario = await buscarUsuario(validation.data.email);
+            if (usuario) {
+                res.status(409).json({ error: "El email que ingresaste ya se encuentra registrado" });
+                return;
+            }
+
+            const hashedPassword = await hashPassword(validation.data.password);
+            const { password_confirmation, ...userData } = validation.data;
+
+            const { user, token } = await prisma.$transaction(async (tx) => {
+                const newUser = await tx.user.create({
+                    data: {
+                        ...userData,
+                        password: hashedPassword
+                    }
+                });
+
+                const newToken = await tx.token.create({
+                    data: {
+                        token: generarToken(),
+                        userId: newUser.id,
+                        expiresAt: new Date(Date.now() + 15 * 60 * 1000) // 15 minutos
+                    }
+                });
+
+                return { user: newUser, token: newToken };
+            });
+
+            await AuthEmail.sendConfirmationEmail({
+                email: user.email,
+                name: user.name,
+                token: token.token
+            });
+
+            res.status(201).json({
+                message: "Usuario registrado correctamente, revisa tu email para confirmar tu cuenta"
+            });
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Error al registrar usuario' });
+        }
+    }
+
+    static updateCurrentUserPassword = async (req: Request, res: Response) => {
+        try {
+            const validation = RegisterSchema.safeParse(req.body);
+            if (!validation.success) {
+                res.status(400).json({ error: formatearErroresZod(validation.error) });
+                return;
+            }
+
+            const usuario = await buscarUsuario(validation.data.email);
+            if (usuario) {
+                res.status(409).json({ error: "El email que ingresaste ya se encuentra registrado" });
+                return;
+            }
+
+            const hashedPassword = await hashPassword(validation.data.password);
+            const { password_confirmation, ...userData } = validation.data;
+
+            const { user, token } = await prisma.$transaction(async (tx) => {
+                const newUser = await tx.user.create({
+                    data: {
+                        ...userData,
+                        password: hashedPassword
+                    }
+                });
+
+                const newToken = await tx.token.create({
+                    data: {
+                        token: generarToken(),
+                        userId: newUser.id,
+                        expiresAt: new Date(Date.now() + 15 * 60 * 1000) // 15 minutos
+                    }
+                });
+
+                return { user: newUser, token: newToken };
+            });
+
+            await AuthEmail.sendConfirmationEmail({
+                email: user.email,
+                name: user.name,
+                token: token.token
+            });
+
+            res.status(201).json({
+                message: "Usuario registrado correctamente, revisa tu email para confirmar tu cuenta"
+            });
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Error al registrar usuario' });
+        }
+    }
+
+    static checkPassword = async (req: Request, res: Response) => {
+        try {
+            const validation = RegisterSchema.safeParse(req.body);
+            if (!validation.success) {
+                res.status(400).json({ error: formatearErroresZod(validation.error) });
+                return;
+            }
+
+            const usuario = await buscarUsuario(validation.data.email);
+            if (usuario) {
+                res.status(409).json({ error: "El email que ingresaste ya se encuentra registrado" });
+                return;
+            }
+
+            const hashedPassword = await hashPassword(validation.data.password);
+            const { password_confirmation, ...userData } = validation.data;
+
+            const { user, token } = await prisma.$transaction(async (tx) => {
+                const newUser = await tx.user.create({
+                    data: {
+                        ...userData,
+                        password: hashedPassword
+                    }
+                });
+
+                const newToken = await tx.token.create({
+                    data: {
+                        token: generarToken(),
+                        userId: newUser.id,
+                        expiresAt: new Date(Date.now() + 15 * 60 * 1000) // 15 minutos
+                    }
+                });
+
+                return { user: newUser, token: newToken };
+            });
+
+            await AuthEmail.sendConfirmationEmail({
+                email: user.email,
+                name: user.name,
+                token: token.token
+            });
+
+            res.status(201).json({
+                message: "Usuario registrado correctamente, revisa tu email para confirmar tu cuenta"
+            });
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Error al registrar usuario' });
+        }
     }
 
 }
