@@ -1,5 +1,5 @@
 import api from "@/lib/axios";
-import { userSchema, type InputEmail, type InputToken, type LoginForm, type NewPasswordForm, type RegisterForm } from "@/types";
+import { userSchema, type CheckPasswordForm, type InputEmail, type InputToken, type LoginForm, type NewPasswordForm, type RegisterForm } from "@/types";
 import { isAxiosError } from "axios";
 
 export async function createAccount(formData: RegisterForm) {
@@ -99,5 +99,17 @@ export async function getUser() {
             throw new Error(error.response.data.error || error.response.data.message);
         }
         throw new Error("Ocurrió un error inesperado al obtener al usuario");
+    }
+}
+
+export async function checkPassword(formData: CheckPasswordForm) {
+    try {
+        const { data } = await api.post("auth/check-password", formData);
+        return data;
+    } catch (error) {
+        if (isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.error || error.response.data.message);
+        }
+        throw new Error("Ocurrió un error inesperado al verificar la contraseña");
     }
 }

@@ -22,10 +22,10 @@ export default function EditProjectForm({ data, projectId }: EditProjectFormProp
     const { mutate, isPending } = useMutation({
         mutationFn: updateProject,
         onSuccess: (data) => {
-            queryClient.invalidateQueries({queryKey: ["projects"]});
-            queryClient.invalidateQueries({queryKey: ["editProject", projectId]});
+            queryClient.invalidateQueries({ queryKey: ["projects"] });
+            queryClient.invalidateQueries({ queryKey: ["editProject", projectId] });
             toast.success(data.message),
-            navigate("/")
+                navigate("/")
         },
         onError: (data) => {
             toast.error(data.message)
@@ -39,20 +39,20 @@ export default function EditProjectForm({ data, projectId }: EditProjectFormProp
 
     return (
         <div className="space-y-6 my-10 pb-6">
-            <h1 className="text-4xl font-black tracking-tight text-slate-900 mb-3">
+            <h1 className="text-5xl font-semibold text-slate-900 mb-3">
                 Editar proyecto
             </h1>
 
-            <p className="text-slate-500 text-base font-medium">
+            <p className="text-2xl font-light text-gray-500 my-5">
                 Edita las bases de tu proyecto para comenzar a asignar tareas y dar seguimiento al progreso.
             </p>
 
             <nav>
                 <Link
-                    to="/"
-                    className="inline-flex items-center justify-center gap-2 bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-semibold text-sm px-5 py-3 rounded-xl shadow-sm transition-all duration-200 transform  hover:shadow-lg hover:shadow-blue-200"
+                    className="uppercase bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-6 rounded-xl transition-all duration-200 cursor-pointer text-xs tracking-wider border border-slate-200"
+                    to={`/`}
                 >
-                    Volver a proyectos
+                    Regresar a proyectos
                 </Link>
             </nav>
 

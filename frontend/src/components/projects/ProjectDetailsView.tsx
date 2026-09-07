@@ -1,4 +1,4 @@
-import { getProjectById } from "@/services/ProjectService";
+import { getFullProjectById } from "@/services/ProjectService";
 import { useQuery } from "@tanstack/react-query";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom"
 import Spinner from "../Spinner";
@@ -20,7 +20,7 @@ export default function ProjectDetailsView() {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["editProject", projectId],
-    queryFn: () => getProjectById(projectId),
+    queryFn: () => getFullProjectById(projectId),
     retry: false
   });
 
@@ -35,7 +35,7 @@ export default function ProjectDetailsView() {
       <p className="text-2xl font-light text-gray-500 my-5">{data.description}</p>
 
       <nav className="my-8 flex flex-wrap items-center gap-4">
-        {isManager(data.manager.id, user.id) && (
+        {isManager(data.manager?.id, user.id) && (
           <>
             <button
               type="button"
