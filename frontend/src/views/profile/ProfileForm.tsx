@@ -1,16 +1,31 @@
 import ErrorMessage from "@/components/ErrorMessage"
+import { updateProfile } from "@/services/ProfileService"
 import type { User, UserProfileForm } from "@/types"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 
 type ProfileFormProps = {
     data: User
 }
 
 export default function ProfileForm({ data }: ProfileFormProps) {
-    const { register, handleSubmit, formState: { errors } } = useForm<UserProfileForm>({ defaultValues: data })
+    const { register, handleSubmit, formState: { errors } } = useForm<UserProfileForm>({ defaultValues: data });
+
+    const queryClient = useQueryClient();
+    const { mutate } = useMutation({
+        mutationFn: updateProfile,
+        onSuccess: (data) => {
+            toast.success(data.message);
+            queryClient.invalidateQueries({queryKey: ["user"]});
+        },
+        onError: (data) => {
+            toast.error(data.message);
+        }
+    });
 
     const handleEditProfile = (formData: UserProfileForm) => {
-        // Lógica de mutación para actualizar perfil
+        mutate(formData);
     }
 
     return (

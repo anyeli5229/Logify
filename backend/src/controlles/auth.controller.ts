@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { EmailSchema, LoginSchema, RegisterSchema, TokenSchema, updatePasswordSchema } from "../schemas/auth.schema";
+import { changePasswordSchema, EmailSchema, LoginSchema, PasswordSchema, ProfileSchema, RegisterSchema, TokenSchema, updatePasswordSchema } from "../schemas/auth.schema";
 import { formatearErroresZod } from "../utils/zodErrors";
 import { buscarUsuario, generarToken, hashPassword, verificarPassword } from "../utils/auth";
 import { prisma } from "../config/prisma";
@@ -313,157 +313,97 @@ export class AuthController {
 
     static updateProfile = async (req: Request, res: Response) => {
         try {
-            const validation = RegisterSchema.safeParse(req.body);
+            const validation = ProfileSchema.safeParse(req.body);
             if (!validation.success) {
                 res.status(400).json({ error: formatearErroresZod(validation.error) });
                 return;
             }
 
-            const usuario = await buscarUsuario(validation.data.email);
-            if (usuario) {
+            const { name, email } = validation.data;
+
+            const usuario = await buscarUsuario(email);
+            if (usuario && usuario.id !== req.usuario.id) {//Verificar que el email no pertenezca a otro usuario
                 res.status(409).json({ error: "El email que ingresaste ya se encuentra registrado" });
                 return;
             }
 
-            const hashedPassword = await hashPassword(validation.data.password);
-            const { password_confirmation, ...userData } = validation.data;
-
-            const { user, token } = await prisma.$transaction(async (tx) => {
-                const newUser = await tx.user.create({
-                    data: {
-                        ...userData,
-                        password: hashedPassword
-                    }
-                });
-
-                const newToken = await tx.token.create({
-                    data: {
-                        token: generarToken(),
-                        userId: newUser.id,
-                        expiresAt: new Date(Date.now() + 15 * 60 * 1000) // 15 minutos
-                    }
-                });
-
-                return { user: newUser, token: newToken };
+            await prisma.user.update({
+                where: { id: req.usuario.id },
+                data: {
+                    name,
+                    email
+                }
             });
 
-            await AuthEmail.sendConfirmationEmail({
-                email: user.email,
-                name: user.name,
-                token: token.token
-            });
 
-            res.status(201).json({
-                message: "Usuario registrado correctamente, revisa tu email para confirmar tu cuenta"
-            });
+            res.status(201).json({ message: "Usuario actualizado correctamente" });
 
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Error al registrar usuario' });
+            res.status(500).json({ error: 'Error al actualizar al usuario' });
         }
     }
 
     static updateCurrentUserPassword = async (req: Request, res: Response) => {
         try {
-            const validation = RegisterSchema.safeParse(req.body);
+            const validation = changePasswordSchema.safeParse(req.body);
             if (!validation.success) {
                 res.status(400).json({ error: formatearErroresZod(validation.error) });
                 return;
             }
 
-            const usuario = await buscarUsuario(validation.data.email);
-            if (usuario) {
-                res.status(409).json({ error: "El email que ingresaste ya se encuentra registrado" });
+            const { current_password, password } = validation.data;
+
+            const usuario = await prisma.user.findUnique({
+                where: { id: req.usuario.id }
+            });
+
+            const isPasswordCorrect = await verificarPassword(current_password, usuario.password);
+
+            if (!isPasswordCorrect) {
+                res.status(401).json({ error: "La contraseña que ingresaste es incorrecta" });
                 return;
             }
 
-            const hashedPassword = await hashPassword(validation.data.password);
-            const { password_confirmation, ...userData } = validation.data;
+            const hashedPassword = await hashPassword(password);
 
-            const { user, token } = await prisma.$transaction(async (tx) => {
-                const newUser = await tx.user.create({
-                    data: {
-                        ...userData,
-                        password: hashedPassword
-                    }
-                });
+            await prisma.user.update({
+                where: { id: req.usuario.id },
+                data: { password: hashedPassword }
+            })
 
-                const newToken = await tx.token.create({
-                    data: {
-                        token: generarToken(),
-                        userId: newUser.id,
-                        expiresAt: new Date(Date.now() + 15 * 60 * 1000) // 15 minutos
-                    }
-                });
-
-                return { user: newUser, token: newToken };
-            });
-
-            await AuthEmail.sendConfirmationEmail({
-                email: user.email,
-                name: user.name,
-                token: token.token
-            });
-
-            res.status(201).json({
-                message: "Usuario registrado correctamente, revisa tu email para confirmar tu cuenta"
-            });
+            res.json({ message: "Contraseña actualizada correctamente" });
 
         } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: 'Error al registrar usuario' });
+            res.status(500).json({ error: "Error al actualizar la contraseña"});
         }
     }
 
     static checkPassword = async (req: Request, res: Response) => {
         try {
-            const validation = RegisterSchema.safeParse(req.body);
+            const validation = PasswordSchema.safeParse(req.body);
             if (!validation.success) {
                 res.status(400).json({ error: formatearErroresZod(validation.error) });
                 return;
             }
 
-            const usuario = await buscarUsuario(validation.data.email);
-            if (usuario) {
-                res.status(409).json({ error: "El email que ingresaste ya se encuentra registrado" });
+            const { password } = validation.data;
+
+            const usuario = await prisma.user.findUnique({
+                where: { id: req.usuario.id }
+            });
+
+            const isPasswordCorrect = await verificarPassword(password, usuario.password);
+            if (!isPasswordCorrect) {
+                res.status(401).json({ error: "La contraseña que ingresaste es incorrecta" });
                 return;
             }
 
-            const hashedPassword = await hashPassword(validation.data.password);
-            const { password_confirmation, ...userData } = validation.data;
-
-            const { user, token } = await prisma.$transaction(async (tx) => {
-                const newUser = await tx.user.create({
-                    data: {
-                        ...userData,
-                        password: hashedPassword
-                    }
-                });
-
-                const newToken = await tx.token.create({
-                    data: {
-                        token: generarToken(),
-                        userId: newUser.id,
-                        expiresAt: new Date(Date.now() + 15 * 60 * 1000) // 15 minutos
-                    }
-                });
-
-                return { user: newUser, token: newToken };
-            });
-
-            await AuthEmail.sendConfirmationEmail({
-                email: user.email,
-                name: user.name,
-                token: token.token
-            });
-
-            res.status(201).json({
-                message: "Usuario registrado correctamente, revisa tu email para confirmar tu cuenta"
-            });
+            res.json({ message: "Contraseña correcta" });
 
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'Error al registrar usuario' });
+            res.status(500).json({ error: 'Hubo un error al verificar la contraseña' });
         }
     }
 

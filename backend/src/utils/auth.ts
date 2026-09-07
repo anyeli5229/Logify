@@ -13,7 +13,7 @@ export async function verificarPassword(password:string, hashedPassword:string) 
 export async function buscarUsuario(email: string) {
     return await prisma.user.findUnique({
         where: { email }
-    })
+    });
 }
 
 export const generarToken = (): string => {

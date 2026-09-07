@@ -50,6 +50,6 @@ export const changePasswordSchema =  z.object({
     message: "Las contraseñas no son iguales",
     path: ["password_confirmation"]
 });
-export const passwordSchema = z.object({
+export const PasswordSchema = z.object({
     password: z.string().trim().min(1, "La contraseña no debe de ir vacía")
 });
