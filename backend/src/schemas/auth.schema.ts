@@ -26,7 +26,7 @@ export const EmailSchema = z.object({
 export const idSchema = z.object({
     id: z.uuid("Ingresa un id válido")
 });
-export const updatePasswordSchema =  z.object({
+export const UpdatePasswordSchema =  z.object({
     password: z.string().trim().min(8, "La contraseña debe de contener mínimo 8 caracteres"),
     password_confirmation: z.string().trim().min(1, "Debes confirmar tu contraseña"),
 })
@@ -34,14 +34,14 @@ export const updatePasswordSchema =  z.object({
     message: "Las contraseñas no son iguales",
     path: ["password_confirmation"]
 });
-export const noteSchema = z.object({
+export const NoteSchema = z.object({
     content: z.string().min(1, "Debes agregar el contenido de la nota")
 });
 export const ProfileSchema = z.object({
     name: z.string().trim().min(1, "Debes de agregar un nombre de usuario"),
     email: z.email("Ingresa un email válido"),
 })
-export const changePasswordSchema =  z.object({
+export const ChangePasswordSchema =  z.object({
     current_password: z.string().trim().min(1, "La contraseña no debe de ir vacía"),
     password: z.string().trim().min(8, "La contraseña debe de contener mínimo 8 caracteres"),
     password_confirmation: z.string().trim().min(1, "Debes confirmar tu contraseña"),

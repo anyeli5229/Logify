@@ -2,11 +2,12 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import ErrorMessage from "@/components/ErrorMessage";
 import type { LoginForm } from "@/types";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Login } from "@/services/AuthService";
 import { toast } from "sonner";
 
 export default function LoginView() {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const initialValues: LoginForm = {
     email: "",
@@ -17,7 +18,8 @@ export default function LoginView() {
 
   const { mutate } = useMutation({
     mutationFn: Login,
-    onSuccess: () => {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["user"] });
       navigate("/");
     },
     onError: (data) => {

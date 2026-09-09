@@ -19,14 +19,14 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                 <div className="space-y-3">
 
                     <div>
-                        <div className=" flex flex-col-reverse md:flex-row md:justify-between md:items-center">
+                        <div className=" flex flex-col-reverse md:flex-row md:justify-between md:items-center gap-2">
                             <h3 className="text-xl font-bold text-slate-900 hover:text-purple-700 hover:underline transition-colors">
                                 <Link to={`/projects/${project.id}`}>{project.projectName}</Link>
                             </h3>
                             <div className="mb-2">
                                 {isManager(project.manager!.id, user.id) ?
-                                    <p className="font-bold text-xs uppercase bg-blue-100 text-blue-600 border-2 border-blue-500 rounded-lg inline-block py-1 px-5">Mánager</p> :
-                                    <p className="font-bold text-xs uppercase bg-amber-100 text-amber-600 border-2 border-amber-500 rounded-lg inline-block py-1 px-5">Colaborador</p>
+                                    <p className="font-bold text-xs uppercase bg-purple-200 text-purple-800 border-2 border-purple-800 rounded-lg inline-block py-1 px-5">Mánager</p> :
+                                    <p className="font-bold text-xs uppercase bg-blue-100 text-blue-800 border-2 border-blue-800 rounded-lg inline-block py-1 px-5">Colaborador</p>
                                 }
                             </div>
                         </div>

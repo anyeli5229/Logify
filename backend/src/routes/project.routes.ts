@@ -10,6 +10,7 @@ import { NoteController } from "../controlles/note.controller";
 import { validateSchema } from "../middlewares/validate.schema.middleware";
 import { createProjectSchema } from "../schemas/project.schema";
 import { createTaskSchema, updateTaskStatusSchema } from "../schemas/task.schema";
+import { EmailSchema, idSchema, NoteSchema } from "../schemas/auth.schema";
 
 const router = Router();
 
@@ -39,13 +40,13 @@ router.delete("/:projectId/tasks/:taskId", hasAuthorization, TaskController.dele
 router.post("/:projectId/tasks/:taskId/status", validateSchema(updateTaskStatusSchema), TaskController.updateStatusTask);
 
 /* TEAM */
-router.post("/:projectId/team/find", TeamController.findMemberByEmail);
-router.post("/:projectId/team", TeamController.addMemberById);
+router.post("/:projectId/team/find", validateSchema(EmailSchema), TeamController.findMemberByEmail);
+router.post("/:projectId/team", validateSchema(idSchema), TeamController.addMemberById);
 router.delete("/:projectId/team/:id", TeamController.deleteMemberById);
 router.get("/:projectId/team", TeamController.getProjectTeam);
 
 /* NOTES */
-router.post("/:projectId/tasks/:taskId/notes", NoteController.createNote);
+router.post("/:projectId/tasks/:taskId/notes", validateSchema(NoteSchema), NoteController.createNote);
 router.get("/:projectId/tasks/:taskId/notes", NoteController.getAllNotes);
 router.delete("/:projectId/tasks/:taskId/notes/:noteId", NoteController.deleteNote);
 

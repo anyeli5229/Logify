@@ -9,7 +9,9 @@ export default function AppLayout() {
 
     const { data, isLoading, isError } = useAuth();
 
-    if (isError) return <Navigate to={"/auth/login"} />
+    if (isError || !data) {
+        return <Navigate to="/auth/login" replace />;
+    }
 
     if (isLoading) {
         return (
@@ -20,19 +22,19 @@ export default function AppLayout() {
     }
 
 
-    if(data) return (
+    return (
         <div className="min-h-screen flex flex-col font-sans">
 
             <Toaster position="top-right" richColors />
 
-            <header className="bg-linear-to-r from-purple-700 via-slate-900 to-slate-950 border-b border-purple-500/20 shadow-lg py-3 px-6 shadow-purple-200">
+            <header className="bg-slate-950 border-b border-purple-500/20 shadow-lg py-3 px-6 shadow-purple-200">
                 <div className="max-w-screen-2xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
 
-                    <div className="w-32 sm:w-36 flex items-center">
-                        <Logo />
+                    <div className="flex justify-center items-center">
+                        <Logo className="h-20 w-auto" />
                     </div>
 
-                    <NavMenu name={data.name}/>
+                    <NavMenu name={data.name} />
 
                 </div>
             </header>
@@ -47,5 +49,5 @@ export default function AppLayout() {
                 Logify &copy; {new Date().getFullYear()} — Gestión de Tareas y Proyectos
             </footer>
         </div>
-    );
+    )
 }

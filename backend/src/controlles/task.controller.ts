@@ -16,10 +16,10 @@ export class TaskController {
                 }
             })
 
-            res.json(tasks);
+            return res.json(tasks);
 
         } catch (error) {
-            res.status(500).json({ error: "Error al buscar las tareas" });
+            return res.status(500).json({ error: "Error al buscar las tareas" });
         }
     }
 
@@ -33,10 +33,10 @@ export class TaskController {
                 }
             });
 
-            res.status(201).json({ message: "Tarea creada correctamente" });
+            return res.status(201).json({ message: "Tarea creada correctamente" });
 
         } catch (error) {
-            res.status(500).json({ error: "Error al crear la tarea" });
+            return res.status(500).json({ error: "Error al crear la tarea" });
         }
     }
 
@@ -65,32 +65,26 @@ export class TaskController {
                     }
                 }
             });
-            res.json(task);
+            return res.json(task);
         } catch (error) {
-            res.status(500).json({ error: "Error al obtener la tarea" });
+            return res.status(500).json({ error: "Error al obtener la tarea" });
         }
     }
 
     static updateTaskById = async (req: Request<{ projectId: string; taskId: string }>, res: Response) => {
         try {
-            const validation = createTaskSchema.safeParse(req.body);
-
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) });
-                return;
-            }
 
             await prisma.task.update({
                 where: {
                     id: req.task.id
                 },
-                data: validation.data
+                data: req.body
             })
 
-            res.json({ message: "Tarea actualizada correctamente" });
+            return res.json({ message: "Tarea actualizada correctamente" });
 
         } catch (error) {
-            res.status(500).json({ error: "Error al actualizar la tarea" });
+            return res.status(500).json({ error: "Error al actualizar la tarea" });
         }
     }
 
@@ -103,10 +97,10 @@ export class TaskController {
                 }
             })
 
-            res.json({ message: "Tarea eliminada correctamente" });
+            return res.json({ message: "Tarea eliminada correctamente" });
 
         } catch (error) {
-            res.status(500).json({ error: "Error al eliminar la tarea" });
+            return res.status(500).json({ error: "Error al eliminar la tarea" });
         }
     }
 
@@ -132,10 +126,10 @@ export class TaskController {
                 }
             });
 
-            res.json({ message: "Estado de la tarea actualizado correctamente" });
+            return res.json({ message: "Estado de la tarea actualizado correctamente" });
 
         } catch (error) {
-            res.status(500).json({ error: "Error al actualizar el estado de la tarea" });
+            return res.status(500).json({ error: "Error al actualizar el estado de la tarea" });
         }
     }
 }

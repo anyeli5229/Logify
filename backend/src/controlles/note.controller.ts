@@ -1,19 +1,12 @@
 import type { Request, Response } from "express"
-import { noteSchema } from "../schemas/auth.schema";
-import { formatearErroresZod } from "../utils/zodErrors";
 import { prisma } from "../config/prisma";
 
 export class NoteController {
 
     static createNote = async (req: Request<{ projectId: string; taskId: string }>, res: Response) => {
         try {
-            const validation = noteSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) })
-                return;
-            }
 
-            const { content } = validation.data;
+            const { content } = req.body;
             const taskId = req.task.id || req.params.taskId;
 
             await prisma.note.create({
@@ -24,10 +17,10 @@ export class NoteController {
                 }
             });
 
-            res.status(201).json({ message: "Nota creada correctamente" });
+            return res.status(201).json({ message: "Nota creada correctamente" });
 
         } catch (error) {
-            res.status(500).json({ error: 'Error al crear la nota' });
+            return res.status(500).json({ error: 'Error al crear la nota' });
         }
     }
 
@@ -48,10 +41,10 @@ export class NoteController {
                 }
             });
 
-            res.json(notes);
+            return res.json(notes);
 
         } catch (error) {
-            res.status(500).json({ error: 'Error al obtener las notas' });
+            return res.status(500).json({ error: 'Error al obtener las notas' });
         }
     }
 
@@ -78,10 +71,10 @@ export class NoteController {
                 where: { id: req.params.noteId }
             });
 
-            res.json({message: "Nota eliminada correctamente"});
+            return res.json({message: "Nota eliminada correctamente"});
 
         } catch (error) {
-            res.status(500).json({ error: 'Error al eliminar la nota' });
+            return res.status(500).json({ error: 'Error al eliminar la nota' });
         }
     }
 }

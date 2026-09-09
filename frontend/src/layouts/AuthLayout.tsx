@@ -11,7 +11,7 @@ export default function AuthLayout() {
                 <div className="w-full max-w-md space-y-8">
                     <div className="flex flex-col items-center justify-center text-center">
                         <div className="w-48 sm:w-64 md:w-72 transition-all duration-200">
-                            <Logo />
+                            <Logo className="h-50" />
                         </div>
                     </div>
                     <div className="bg-gray-900/80 backdrop-blur-md border border-gray-800 shadow-2xl rounded-2xl p-6 sm:p-8">

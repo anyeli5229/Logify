@@ -106,7 +106,7 @@ export const projectSchema = editProjectSchema.extend({
   id: z.string(),
   userId: z.string().optional(),
   manager: TeamMemberSchema.optional(),
-  tasks: z.array(taskSchema),
+  tasks: z.array(taskSchema).optional(),
 });
 
 export const dashboardProjectSchema = z.array(

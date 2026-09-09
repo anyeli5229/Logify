@@ -1,7 +1,5 @@
 import type { Request, Response } from "express";
-import { createProjectSchema } from "../schemas/project.schema";
 import { prisma } from "../config/prisma";
-import { formatearErroresZod } from "../utils/zodErrors";
 
 export class ProjectController {
 
@@ -27,9 +25,9 @@ export class ProjectController {
                 }
             });
 
-            res.json(projects);
+            return res.json(projects);
         } catch (error) {
-            res.status(500).json({ error: 'Error al obtener los proyectos' });
+            return res.status(500).json({ error: 'Error al obtener los proyectos' });
         }
     }
 
@@ -43,15 +41,15 @@ export class ProjectController {
                 }
             });
 
-            res.status(201).json({ message: "Proyecto creado correctamente" });
+            return res.status(201).json({ message: "Proyecto creado correctamente" });
         } catch (error) {
-            res.status(500).json({ error: 'Error al crear el proyecto' });
+            return res.status(500).json({ error: 'Error al crear el proyecto' });
         }
     }
 
     static getProjectById = async (req: Request, res: Response) => {
         // req.project ya fue cargado por el middleware
-        res.json(req.project);
+        return res.json(req.project);
     }
 
     static updateProject = async (req: Request, res: Response) => {
@@ -62,9 +60,9 @@ export class ProjectController {
                 data: req.body
             });
 
-            res.json({ message: "Proyecto actualizado correctamente" });
+            return res.json({ message: "Proyecto actualizado correctamente" });
         } catch (error) {
-            res.status(500).json({ error: 'Error al actualizar el proyecto' });
+            return res.status(500).json({ error: 'Error al actualizar el proyecto' });
         }
     }
 
@@ -74,9 +72,9 @@ export class ProjectController {
                 where: { id: req.project.id }
             });
 
-            res.json({ message: "Proyecto eliminado correctamente" });
+            return res.json({ message: "Proyecto eliminado correctamente" });
         } catch (error) {
-            res.status(500).json({ error: "Error al eliminar el proyecto" });
+            return res.status(500).json({ error: "Error al eliminar el proyecto" });
         }
     }
 }

@@ -1,6 +1,4 @@
 import { Request, Response } from "express";
-import { changePasswordSchema, EmailSchema, LoginSchema, PasswordSchema, ProfileSchema, RegisterSchema, TokenSchema, updatePasswordSchema } from "../schemas/auth.schema";
-import { formatearErroresZod } from "../utils/zodErrors";
 import { buscarUsuario, generarToken, hashPassword, verificarPassword } from "../utils/auth";
 import { prisma } from "../config/prisma";
 import { AuthEmail } from "../emails/auth.email";
@@ -10,20 +8,14 @@ export class AuthController {
 
     static createAccount = async (req: Request, res: Response) => {
         try {
-            const validation = RegisterSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) });
-                return;
-            }
-
-            const usuario = await buscarUsuario(validation.data.email);
+            const usuario = await buscarUsuario(req.body.email);
             if (usuario) {
                 res.status(409).json({ error: "El email que ingresaste ya se encuentra registrado" });
                 return;
             }
 
-            const hashedPassword = await hashPassword(validation.data.password);
-            const { password_confirmation, ...userData } = validation.data;
+            const hashedPassword = await hashPassword(req.body.password);
+            const { password_confirmation, ...userData } = req.body;
 
             const { user, token } = await prisma.$transaction(async (tx) => {
                 const newUser = await tx.user.create({
@@ -55,20 +47,15 @@ export class AuthController {
             });
 
         } catch (error) {
-            console.error(error);
             res.status(500).json({ error: 'Error al registrar usuario' });
+            return;
         }
     }
 
     static confirmAccount = async (req: Request, res: Response) => {
         try {
-            const validation = TokenSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) })
-                return;
-            }
             const token = await prisma.token.findFirst({
-                where: { token: validation.data.token }
+                where: { token: req.body.token }
             });
 
             if (!token) {
@@ -98,22 +85,14 @@ export class AuthController {
             res.json({ message: "Cuenta confirmada éxitosamente." })
 
         } catch (error) {
-            console.error(error);
             res.status(500).json({ error: 'Error al confirmar cuenta' });
+            return;
         }
     }
 
     static login = async (req: Request, res: Response) => {
         try {
-            const validation = LoginSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) })
-                return;
-            }
-
-            const usuario = await prisma.user.findUnique({
-                where: { email: validation.data.email }
-            });
+            const usuario = await buscarUsuario(req.body.email);
 
             if (!usuario) {
                 res.status(404).json({ error: "El email que ingresaste no se encuentra registrado" })
@@ -125,7 +104,7 @@ export class AuthController {
                 return;
             }
 
-            const checkPassword = await verificarPassword(validation.data.password, usuario.password);
+            const checkPassword = await verificarPassword(req.body.password, usuario.password);
 
             if (!checkPassword) {
                 res.status(401).json({ error: "La contraseña que ingresaste no es correcta" })
@@ -137,19 +116,13 @@ export class AuthController {
 
         } catch (error) {
             res.status(500).json({ error: 'Error al autenticar al usuario' });
+            return;
         }
     }
 
     static requestConfirmCode = async (req: Request, res: Response) => {
         try {
-            const validation = EmailSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) })
-                return;
-            }
-            const usuario = await prisma.user.findFirst({
-                where: { email: validation.data.email }
-            });
+            const usuario = await buscarUsuario(req.body.email);
 
             if (!usuario) {
                 res.status(404).json({ error: "El email que ingresaste no se encuentra registrado." })
@@ -180,22 +153,15 @@ export class AuthController {
             });
 
         } catch (error) {
-            console.error(error);
             res.status(500).json({ error: 'Error al confirmar cuenta' });
+            return;
         }
     }
 
     static forgotPassword = async (req: Request, res: Response) => {
         try {
-            const validation = EmailSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) })
-                return;
-            }
-            const usuario = await prisma.user.findFirst({
-                where: { email: validation.data.email }
-            });
 
+            const usuario = await buscarUsuario(req.body.email);
             if (!usuario) {
                 res.status(404).json({ error: "El email que ingresaste no se encuentra registrado." })
                 return;
@@ -220,20 +186,15 @@ export class AuthController {
             });
 
         } catch (error) {
-            console.error(error);
             res.status(500).json({ error: 'Error al enviar código' });
+            return;
         }
     }
 
     static validateToken = async (req: Request, res: Response) => {
         try {
-            const validation = TokenSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) })
-                return;
-            }
             const token = await prisma.token.findFirst({
-                where: { token: validation.data.token }
+                where: { token: req.body.token }
             });
 
             if (!token) {
@@ -252,18 +213,13 @@ export class AuthController {
             res.json({ message: "Token válido, define tu nueva contraseña." })
 
         } catch (error) {
-            console.error(error);
             res.status(500).json({ error: 'Error al confirmar token' });
+            return;
         }
     }
 
     static updatePassword = async (req: Request, res: Response) => {
         try {
-            const validation = updatePasswordSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) });
-                return;
-            }
 
             const tokenParam = req.params.token as string;
 
@@ -286,7 +242,7 @@ export class AuthController {
                 return;
             }
 
-            const hashedPassword = await hashPassword(validation.data.password);
+            const hashedPassword = await hashPassword(req.body.password);
 
             await prisma.$transaction([
                 prisma.user.update({
@@ -301,8 +257,8 @@ export class AuthController {
             res.json({ message: "Contraseña actualizada correctamente." });
 
         } catch (error) {
-            console.error(error);
             res.status(500).json({ error: "Error al actualizar la contraseña" });
+            return;
         }
     }
 
@@ -313,13 +269,7 @@ export class AuthController {
 
     static updateProfile = async (req: Request, res: Response) => {
         try {
-            const validation = ProfileSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) });
-                return;
-            }
-
-            const { name, email } = validation.data;
+            const { name, email } = req.body;
 
             const usuario = await buscarUsuario(email);
             if (usuario && usuario.id !== req.usuario.id) {//Verificar que el email no pertenezca a otro usuario
@@ -339,20 +289,14 @@ export class AuthController {
             res.status(201).json({ message: "Usuario actualizado correctamente" });
 
         } catch (error) {
-            console.error(error);
             res.status(500).json({ error: 'Error al actualizar al usuario' });
+            return;
         }
     }
 
     static updateCurrentUserPassword = async (req: Request, res: Response) => {
         try {
-            const validation = changePasswordSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) });
-                return;
-            }
-
-            const { current_password, password } = validation.data;
+            const { current_password, password } = req.body;
 
             const usuario = await prisma.user.findUnique({
                 where: { id: req.usuario.id }
@@ -376,18 +320,13 @@ export class AuthController {
 
         } catch (error) {
             res.status(500).json({ error: "Error al actualizar la contraseña"});
+            return;
         }
     }
 
     static checkPassword = async (req: Request, res: Response) => {
         try {
-            const validation = PasswordSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) });
-                return;
-            }
-
-            const { password } = validation.data;
+            const { password } = req.body;
 
             const usuario = await prisma.user.findUnique({
                 where: { id: req.usuario.id }
@@ -402,8 +341,8 @@ export class AuthController {
             res.json({ message: "Contraseña correcta" });
 
         } catch (error) {
-            console.error(error);
             res.status(500).json({ error: 'Hubo un error al verificar la contraseña' });
+            return;
         }
     }
 

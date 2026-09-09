@@ -8,14 +8,8 @@ export class TeamController {
 
     static findMemberByEmail = async (req: Request, res: Response) => {
         try {
-            const validation = EmailSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) });
-                return;
-            }
-
             const usuario = await prisma.user.findFirst({
-                where: { email: validation.data.email },
+                where: { email: req.body.email },
                 select: {
                     id: true,
                     name: true,
@@ -38,14 +32,8 @@ export class TeamController {
 
     static addMemberById = async (req: Request, res: Response) => {
         try {
-            const validation = idSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) });
-                return;
-            }
-
             const usuario = await prisma.user.findUnique({
-                where: { id: validation.data.id },
+                where: { id: req.body.id },
                 select: {
                     id: true
                 }
@@ -72,6 +60,7 @@ export class TeamController {
             });
 
             res.json({ message: "Usuario agregado al equipo correctamente" });
+            return;
 
         } catch (error) {
             res.status(500).json({ error: "Error al agregar al usuario" });
@@ -110,6 +99,7 @@ export class TeamController {
             });
 
             res.json({ message: "Usuario eliminado del equipo correctamente" });
+            return;
 
         } catch (error) {
             res.status(500).json({ error: "Error al eliminar al usuario" });
@@ -121,9 +111,9 @@ export class TeamController {
         try {
             // req.project.team ya contiene la lista de usuarios (id, name, email) 
             // cargada previamente desde el middleware validateProjectExist
-            res.json(req.project.team);
+            return res.json(req.project.team);
         } catch (error) {
-            res.status(500).json({ error: "Error al obtener los colaboradores del proyecto" });
+            return res.status(500).json({ error: "Error al obtener los colaboradores del proyecto" });
         }
     }
 }
