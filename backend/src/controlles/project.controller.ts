@@ -35,15 +35,10 @@ export class ProjectController {
 
     static createProject = async (req: Request, res: Response) => {
         try {
-            const validation = createProjectSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) });
-                return;
-            }
 
             await prisma.project.create({
                 data: {
-                    ...validation.data,
+                    ...req.body,
                     userId: req.usuario.id
                 }
             });
@@ -61,15 +56,10 @@ export class ProjectController {
 
     static updateProject = async (req: Request, res: Response) => {
         try {
-            const validation = createProjectSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) });
-                return;
-            }
 
             await prisma.project.update({
                 where: { id: req.project.id },
-                data: validation.data
+                data: req.body
             });
 
             res.json({ message: "Proyecto actualizado correctamente" });

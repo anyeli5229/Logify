@@ -26,18 +26,12 @@ export class TaskController {
     static createTask = async (req: Request<{ projectId: string }>, res: Response) => {
         try {
 
-            const validation = createTaskSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) });
-                return;
-            }
-
             await prisma.task.create({
                 data: {
-                    ...validation.data,
+                    ...req.body,
                     projectId: req.project.id
                 }
-            })
+            });
 
             res.status(201).json({ message: "Tarea creada correctamente" });
 
@@ -118,14 +112,7 @@ export class TaskController {
 
     static updateStatusTask = async (req: Request<{ projectId: string; taskId: string }>, res: Response) => {
         try {
-
-            const validation = updateTaskStatusSchema.safeParse(req.body);
-            if (!validation.success) {
-                res.status(400).json({ error: formatearErroresZod(validation.error) });
-                return;
-            }
-
-            const { status } = validation.data;
+            const { status } = req.body;
 
             await prisma.task.update({//Actualizar estado 
                 where: {
