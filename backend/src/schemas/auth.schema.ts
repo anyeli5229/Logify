@@ -7,7 +7,7 @@ export const RegisterSchema = z.object({
     email: z.email("Ingresa un email válido"),
 })
 .refine((data) => data.password === data.password_confirmation, {
-    message: "Las contraseñas no son iguales",
+    message: "Las contraseñas no coinciden",
     path: ["password_confirmation"]
 });
 export type RegisterInput = z.infer<typeof RegisterSchema>;
